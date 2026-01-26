@@ -1,0 +1,18 @@
+# --- Affiliate Links (Soft Routes) ---
+# 1. BinPay (推荐/低费率)
+/go/binpay    https://app.binpay.cc/pages/passport/invitation?r=1149583    302
+
+# 2. PokePay (国内生活/实体卡)
+/go/pokepay   https://app.pokepay.cc/pages/invitation/regist?r=365888     302
+
+# 3. VCard (全球转账)
+/go/vcard     https://webapp.51vcard.com/#InviteRegisterPage?inviteCode=146333  302
+
+# 4. WasabiCard (匿名/免KYC)
+/go/wasabicard https://app.wasabicard.com/en/auth/sign-up?ref=5jx8ft0z3p    302
+
+# 5. BiyaPay (大额出金/股票)
+/go/biyapay   https://biyapay.com/re/601187    302
+
+# 6. OKX (欧易买币指引)
+/go/okx       https://join-ouyi.top    302
