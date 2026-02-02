@@ -2,8 +2,8 @@
 
 <html lang="zh-CN">
 <head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>UCards</title>
-<meta content="UCards - Crypto Virtual Cards" name="description"/><link href="https://ucards.top/blog/sample" rel="canonical"/>
-<meta content="index, follow" name="robots"/><meta content="zh-cn" http-equiv="content-language"/><link href="https://ucards.top/blog/sample" hreflang="x-default" rel="alternate"/><link href="https://ucards.top/blog/sample" hreflang="zh" rel="alternate"/><link href="https://ucards.top/blog/sample" hreflang="zh-CN" rel="alternate"/>
+<meta content="UCards - Crypto Virtual Cards" name="description"/><link href="https://ucards.top/" rel="canonical"/>
+<meta content="index, follow" name="robots"/><meta content="zh-cn" http-equiv="content-language"/><link href="https://ucards.top/" hreflang="x-default" rel="alternate"/><link href="https://ucards.top/" hreflang="zh" rel="alternate"/><link href="https://ucards.top/" hreflang="zh-CN" rel="alternate"/>
 <link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;💳&lt;/text&gt;&lt;/svg&gt;" rel="icon"/><script src="https://cdn.tailwindcss.com"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/><script>
         tailwind.config = {
             theme: {
@@ -13,17 +13,16 @@
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        page: '#030303', // 更深邃的黑
+                        page: '#030303',
                         card: '#0A0A0A',
                         stroke: 'rgba(255, 255, 255, 0.08)'
-                    },
-                    backgroundImage: {
-                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-                        'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #2a8af6 0deg, #a853ba 180deg, #e92a67 360deg)',
                     },
                     animation: {
                         'blob': 'blob 7s infinite',
                         'shine': 'shine 1.5s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'gradient-x': 'gradientX 3s ease infinite',
                     },
                     keyframes: {
                         blob: {
@@ -32,8 +31,14 @@
                             '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
                             '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         },
-                        shine: {
-                            '100%': { left: '125%' },
+                        shine: { '100%': { left: '125%' } },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        gradientX: {
+                            '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left center' },
+                            '50%': { 'background-size': '200% 200%', 'background-position': 'right center' },
                         }
                     }
                 }
@@ -42,16 +47,13 @@
     </script><script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "CollectionPage",
-      "name": "Top Virtual Credit Cards for 2026",
-      "description": "Reviews of BinPay, PokePay, and other top crypto cards.",
-      "mainEntity": {
-        "@type": "ItemList",
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "BinPay" },
-          { "@type": "ListItem", "position": 2, "name": "PokePay" },
-          { "@type": "ListItem", "position": 3, "name": "VCard" }
-        ]
+      "@type": "WebSite",
+      "name": "UCards",
+      "url": "https://ucards.top/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://ucards.top/?s={search_term_string}",
+        "query-input": "required name=search_term_string"
       }
     }
     </script><style>
@@ -107,37 +109,13 @@
 <script type="application/ld+json">[
   {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
+    "@type": "CollectionPage",
     "headline": "UCards",
-    "url": "https://ucards.top/blog/sample",
+    "url": "https://ucards.top/",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://ucards.top/blog/sample"
+      "@id": "https://ucards.top/"
     }
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://ucards.top"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Blog",
-        "item": "https://ucards.top/blog"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": "UCards",
-        "item": "https://ucards.top/blog/sample"
-      }
-    ]
   }
 ]</script></head>
 <body><nav class="fixed w-full z-50 top-0 left-0 transition-all duration-300 border-b border-transparent" id="navbar">
@@ -197,18 +175,18 @@
 <i class="fa-solid fa-rocket mr-2"></i> 前往欧易买币
             </a>
 </div>
-</nav><nav aria-label="breadcrumb" class="max-w-7xl mx-auto px-6 py-4 text-sm text-slate-400"><ol class="flex items-center gap-2"><li><a class="hover:text-white transition" href="/">Home</a></li><li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li><li>Blog</li><li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li><li class="text-white font-medium truncate max-w-[200px]">Sample Article Title</li></ol></nav>
-<main class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-4 gap-12">
-<article class="lg:col-span-3">
-<h1>Sample Article Title</h1>
-<p>This is a sample article content.</p>
-<section class="py-12 border-t border-gray-200 mt-12"><div class="max-w-4xl mx-auto"><h3 class="text-2xl font-bold mb-6">推荐阅读</h3><div class="grid gap-6 md:grid-cols-2"><a class="block p-6 bg-gray-50 rounded-xl hover:bg-blue-50 transition" href="/"><div class="font-bold mb-2">返回首页</div></a></div></div></section><section class="py-12 border-t border-gray-200 mt-12"><div class="max-w-4xl mx-auto"><h3 class="text-2xl font-bold mb-6">推荐阅读</h3><div class="grid gap-6 md:grid-cols-2"><a class="block p-6 bg-gray-50 rounded-xl hover:bg-blue-50 transition" href="/"><div class="font-bold mb-2">返回首页</div></a></div></div></section><section class="py-12 border-t border-gray-200 mt-12"><div class="max-w-4xl mx-auto"><h3 class="text-2xl font-bold mb-6">推荐阅读</h3><div class="grid gap-6 md:grid-cols-2"><a class="block p-6 bg-gray-50 rounded-xl hover:bg-blue-50 transition" href="/"><div class="font-bold mb-2">返回首页</div></a></div></div></section><section class="py-12 border-t border-white/10 mt-12" id="recommended-reading"><div class="max-w-4xl mx-auto"><h3 class="text-2xl font-bold mb-6 text-white">推荐阅读</h3><div class="grid gap-6 md:grid-cols-2"><a class="block p-6 bg-[#0A0A0A] border border-white/10 rounded-xl hover:border-blue-500/50 transition group" href="/"><div class="font-bold mb-2 text-slate-200 group-hover:text-blue-400">返回首页</div></a></div></div></section></article>
-<aside class="lg:col-span-1">
-<div class="p-6 bg-gray-100 rounded">
-<h3>Sidebar</h3>
-<p>This sidebar should be preserved.</p>
-</div>
-</aside>
+</nav>
+<main class="max-w-7xl mx-auto px-6 py-12">
+<header class="mb-12 text-center">
+<h1 class="text-3xl md:text-5xl font-bold text-white mb-6">
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">UCards 博客中心</span>
+</h1>
+<p class="text-lg text-slate-400 max-w-2xl mx-auto">
+                探索 Web3 支付的无限可能，掌握 U 卡使用技巧与安全指南。
+            </p>
+</header>
+<!-- Blog Posts Grid - Will be populated by build.py -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="all-articles"><a class="group block bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/30 transition duration-300 flex flex-col h-full" href="/blog/what-is-ucard"><div class="p-8 flex flex-col flex-grow"><div class="mb-4 flex items-center justify-between"><span class="inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">Article</span><span class="text-xs text-slate-500">2026-02-02</span></div><h3 class="text-xl font-bold text-white mb-4 group-hover:text-blue-400 transition line-clamp-2">UCards</h3><p class="text-sm text-slate-400 mb-6 line-clamp-3 leading-relaxed">UCards - Crypto Virtual Cards</p><div class="mt-auto text-slate-500 text-sm font-bold flex items-center gap-2 group-hover:text-white transition">Read More<i class="fa-solid fa-arrow-right opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"></i></div></div></a></div>
 </main>
 <footer class="relative z-10 bg-[#000000] border-t border-white/5 pt-20 pb-10 overflow-hidden font-sans">
 <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-50"></div>

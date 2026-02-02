@@ -13,17 +13,16 @@
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        page: '#030303', // 更深邃的黑
+                        page: '#030303',
                         card: '#0A0A0A',
                         stroke: 'rgba(255, 255, 255, 0.08)'
-                    },
-                    backgroundImage: {
-                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-                        'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #2a8af6 0deg, #a853ba 180deg, #e92a67 360deg)',
                     },
                     animation: {
                         'blob': 'blob 7s infinite',
                         'shine': 'shine 1.5s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'gradient-x': 'gradientX 3s ease infinite',
                     },
                     keyframes: {
                         blob: {
@@ -32,8 +31,14 @@
                             '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
                             '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         },
-                        shine: {
-                            '100%': { left: '125%' },
+                        shine: { '100%': { left: '125%' } },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        gradientX: {
+                            '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left center' },
+                            '50%': { 'background-size': '200% 200%', 'background-position': 'right center' },
                         }
                     }
                 }
@@ -42,16 +47,13 @@
     </script><script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "CollectionPage",
-      "name": "Top Virtual Credit Cards for 2026",
-      "description": "Reviews of BinPay, PokePay, and other top crypto cards.",
-      "mainEntity": {
-        "@type": "ItemList",
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "BinPay" },
-          { "@type": "ListItem", "position": 2, "name": "PokePay" },
-          { "@type": "ListItem", "position": 3, "name": "VCard" }
-        ]
+      "@type": "WebSite",
+      "name": "UCards",
+      "url": "https://ucards.top/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://ucards.top/?s={search_term_string}",
+        "query-input": "required name=search_term_string"
       }
     }
     </script><style>
@@ -191,7 +193,7 @@
 <i class="fa-solid fa-rocket mr-2"></i> 前往欧易买币
             </a>
 </div>
-</nav><nav aria-label="breadcrumb" class="max-w-7xl mx-auto px-6 py-4 text-sm text-slate-400"><ol class="flex items-center gap-2"><li><a class="hover:text-white transition" href="/">Home</a></li><li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li><li class="text-white font-medium truncate max-w-[200px]">服务条款 (Terms of Service)</li></ol></nav>
+</nav><nav aria-label="breadcrumb" class="max-w-7xl mx-auto px-6 py-4 mt-24 text-sm text-slate-400"><ol class="flex items-center gap-2"><li><a class="hover:text-white transition" href="/">Home</a></li><li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li><li class="text-white font-medium truncate max-w-[200px]">服务条款 (Terms of Service)</li></ol></nav>
 <main class="flex-grow py-20 px-6">
 <div class="max-w-3xl mx-auto prose">
 <h1>服务条款 (Terms of Service)</h1>

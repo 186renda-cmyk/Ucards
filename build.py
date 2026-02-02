@@ -3,6 +3,7 @@ import re
 import json
 import datetime
 from bs4 import BeautifulSoup, Comment
+import copy
 
 # Configuration
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -165,9 +166,15 @@ def reconstruct_head(soup, assets, filename, page_type='page'):
     schemas = []
     
     # 1. Main Entity Schema
+    main_type = "WebPage"
+    if page_type == 'blog':
+        main_type = "BlogPosting"
+        if filename == 'index.html':
+            main_type = "CollectionPage"
+
     main_schema = {
         "@context": "https://schema.org",
-        "@type": "BlogPosting" if page_type == 'blog' else "WebPage",
+        "@type": main_type,
         "headline": title_text,
         "url": canonical_url,
         "mainEntityOfPage": {
@@ -216,6 +223,128 @@ def reconstruct_head(soup, assets, filename, page_type='page'):
     script_tag.string = json.dumps(schemas, indent=2)
     head.append(script_tag)
 
+def inject_sidebar(soup):
+    """
+    Inject sales cards sidebar into <aside>
+    """
+    aside = soup.find('aside')
+    if not aside:
+        return
+
+    aside.clear()
+    
+    # Create Sidebar Container
+    container = soup.new_tag('div', **{'class': 'sticky top-24 space-y-6'})
+    
+    # 1. Title
+    title_div = soup.new_tag('div', **{'class': 'flex items-center gap-2 mb-2'})
+    icon = soup.new_tag('i', **{'class': 'fa-solid fa-fire text-red-500'})
+    h3 = soup.new_tag('h3', **{'class': 'text-sm font-bold text-slate-400 uppercase tracking-wider'})
+    h3.string = "快速通道"
+    title_div.append(icon)
+    title_div.append(h3)
+    container.append(title_div)
+
+    # 2. Register Card (General Guide)
+    reg_card = soup.new_tag('div', **{'class': 'relative group'})
+    reg_html = BeautifulSoup("""
+    <div class="absolute -inset-0.5 bg-gradient-to-b from-[#F59E0B] to-transparent rounded-2xl opacity-20 group-hover:opacity-100 blur transition duration-500"></div>
+    <div class="relative bg-[#0A0A0A] rounded-xl p-5 border border-white/10 flex flex-col gap-4 transition-transform group-hover:-translate-y-1">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-500 text-xl">
+                <i class="fa-solid fa-credit-card"></i>
+            </div>
+            <div>
+                <h4 class="text-base font-bold text-white leading-tight">申请加密 U 卡</h4>
+                <p class="text-[10px] text-slate-400">ChatGPT · Midjourney · 支付宝</p>
+            </div>
+        </div>
+        <div class="space-y-2">
+            <div class="flex items-center gap-2 text-xs text-slate-300">
+                <i class="fa-solid fa-check text-green-500"></i> 支持 USDT 直接充值
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-300">
+                <i class="fa-solid fa-check text-green-500"></i> 绑定微信/支付宝消费
+            </div>
+        </div>
+        <a href="/#rank" class="block w-full py-2.5 bg-[#F59E0B] hover:bg-[#D97706] text-black font-bold text-center text-sm rounded-lg transition shadow-lg shadow-yellow-500/20">
+            立即申请 <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+        </a>
+    </div>
+    """, 'html.parser')
+    for child in list(reg_html.contents):
+        reg_card.append(child)
+    container.append(reg_card)
+
+    # 3. USDT Top-up (Guide)
+    guide = soup.new_tag('div', **{'class': 'relative group'})
+    guide_html = BeautifulSoup("""
+    <div class="absolute -inset-0.5 bg-gradient-to-b from-blue-600 to-transparent rounded-2xl opacity-20 group-hover:opacity-100 blur transition duration-500"></div>
+    <div class="relative bg-[#0A0A0A] rounded-xl p-5 border border-white/10 flex flex-col gap-4 transition-transform group-hover:-translate-y-1">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-600/20 flex items-center justify-center text-blue-400 text-xl">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div>
+                <h4 class="text-base font-bold text-white leading-tight">USDT 充值教程</h4>
+                <p class="text-[10px] text-slate-400">新手必看 · 安全不冻卡</p>
+            </div>
+        </div>
+        <p class="text-xs text-slate-400 leading-relaxed">还没 U？手把手教你在交易所安全购买 USDT。</p>
+        <a href="/#guide" class="block w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-center text-sm rounded-lg transition shadow-lg shadow-blue-600/20">
+            查看教程 <i class="fa-solid fa-book-open ml-1 text-xs"></i>
+        </a>
+    </div>
+    """, 'html.parser')
+    for child in list(guide_html.contents):
+        guide.append(child)
+    container.append(guide)
+
+    aside.append(container)
+
+def create_article_card(soup, post):
+    """
+    Generate Article Card HTML
+    """
+    card = soup.new_tag('a', href=post['url'], **{'class': 'group block bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/30 transition duration-300 flex flex-col h-full'})
+    
+    # Content
+    content_div = soup.new_tag('div', **{'class': 'p-8 flex flex-col flex-grow'})
+    
+    # Icon/Tag
+    tag_div = soup.new_tag('div', **{'class': 'mb-4 flex items-center justify-between'})
+    tag_span = soup.new_tag('span', **{'class': 'inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20'})
+    tag_span.string = "Article"
+    tag_div.append(tag_span)
+    
+    # Date
+    date_span = soup.new_tag('span', **{'class': 'text-xs text-slate-500'})
+    date_span.string = datetime.datetime.fromtimestamp(post['mod_time']).strftime('%Y-%m-%d')
+    tag_div.append(date_span)
+    
+    content_div.append(tag_div)
+    
+    # Title
+    h3 = soup.new_tag('h3', **{'class': 'text-xl font-bold text-white mb-4 group-hover:text-blue-400 transition line-clamp-2'})
+    h3.string = post['title']
+    content_div.append(h3)
+    
+    # Description (optional, if available)
+    if 'description' in post and post['description']:
+        p = soup.new_tag('p', **{'class': 'text-sm text-slate-400 mb-6 line-clamp-3 leading-relaxed'})
+        p.string = post['description']
+        content_div.append(p)
+    
+    # Arrow (at bottom)
+    arrow = soup.new_tag('div', **{'class': 'mt-auto text-slate-500 text-sm font-bold flex items-center gap-2 group-hover:text-white transition'})
+    arrow.string = "Read More"
+    icon = soup.new_tag('i', **{'class': 'fa-solid fa-arrow-right opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300'})
+    arrow.append(icon)
+    content_div.append(arrow)
+    
+    card.append(content_div)
+    return card
+
 def inject_content(soup, assets, page_type='page', filename=''):
     """
     Phase 3: Content Injection
@@ -228,24 +357,20 @@ def inject_content(soup, assets, page_type='page', filename=''):
     # 1. Layout Synchronization (Header/Nav)
     # Remove existing nav/header
     for tag in body.find_all(['nav', 'header']):
-        # Be careful not to remove header inside article? 
-        # But we want to replace the site header.
-        # Assuming <nav> is the main nav.
         if tag.name == 'nav' and 'breadcrumb' in tag.get('aria-label', ''):
-             tag.decompose() # Remove old breadcrumb
+             tag.decompose() 
         elif tag.name == 'nav':
-             tag.decompose() # Remove old main nav
+             tag.decompose()
         
     # Inject new Nav at the beginning
     if assets['nav']:
-        # We need a copy because we might inject it multiple times
-        import copy
         new_nav = copy.copy(assets['nav'])
         body.insert(0, new_nav)
         
     # Inject Visible Breadcrumb (after Nav)
+    # Added mt-24 to fix spacing issue with fixed navbar
     if filename != 'index.html':
-        breadcrumb_nav = soup.new_tag('nav', attrs={'aria-label': 'breadcrumb', 'class': 'max-w-7xl mx-auto px-6 py-4 text-sm text-slate-400'})
+        breadcrumb_nav = soup.new_tag('nav', attrs={'aria-label': 'breadcrumb', 'class': 'max-w-7xl mx-auto px-6 py-4 mt-24 text-sm text-slate-400'})
         ol = soup.new_tag('ol', attrs={'class': 'flex items-center gap-2'})
         
         # Home
@@ -261,10 +386,12 @@ def inject_content(soup, assets, page_type='page', filename=''):
         li_sep.append(i_sep)
         ol.append(li_sep)
         
-        if page_type == 'blog':
+        if page_type == 'blog' and filename != 'index.html':
             # Blog
             li_blog = soup.new_tag('li')
-            li_blog.string = 'Blog'
+            a_blog = soup.new_tag('a', href='/blog', attrs={'class': 'hover:text-white transition'})
+            a_blog.string = 'Blog'
+            li_blog.append(a_blog)
             ol.append(li_blog)
             
             # Separator
@@ -277,21 +404,18 @@ def inject_content(soup, assets, page_type='page', filename=''):
         li_curr = soup.new_tag('li', attrs={'class': 'text-white font-medium truncate max-w-[200px]'})
         # Try to find H1 for title, or fallback to filename
         h1 = soup.find('h1')
-        li_curr.string = h1.string if h1 else filename.replace('.html', '')
+        li_curr.string = h1.get_text(strip=True) if h1 else filename.replace('.html', '')
         ol.append(li_curr)
         
         breadcrumb_nav.append(ol)
         
         # Insert after main nav
-        # body.contents[0] is nav (hopefully)
-        # Find index of nav
         nav_idx = 0
         for i, child in enumerate(body.children):
             if child.name == 'nav' and child.get('id') == 'navbar':
                 nav_idx = i
                 break
         
-        # Insert after nav
         body.insert(nav_idx + 1, breadcrumb_nav)
         
     # 2. Footer
@@ -301,12 +425,14 @@ def inject_content(soup, assets, page_type='page', filename=''):
         
     # Inject new Footer at the end
     if assets['footer']:
-        import copy
         new_footer = copy.copy(assets['footer'])
         body.append(new_footer)
         
-    # 4. Smart Recommendation (Blog only)
-    if page_type == 'blog':
+    # 4. Smart Recommendation (Blog Post only)
+    if page_type == 'blog' and filename != 'index.html':
+        # Inject Sidebar
+        inject_sidebar(soup)
+
         article = body.find('article')
         if article:
             # Check if recommendation already exists
@@ -327,7 +453,7 @@ def inject_content(soup, assets, page_type='page', filename=''):
             count = 0
             if os.path.exists(BLOG_DIR):
                 for f in os.listdir(BLOG_DIR):
-                    if f.endswith('.html') and f != filename:
+                    if f.endswith('.html') and f != filename and f != 'index.html':
                         # Create link
                         link_href = f"/blog/{f.replace('.html', '')}"
                         item = soup.new_tag('a', href=link_href, **{'class': 'block p-6 bg-[#0A0A0A] border border-white/10 rounded-xl hover:border-blue-500/50 transition group'})
@@ -350,10 +476,53 @@ def inject_content(soup, assets, page_type='page', filename=''):
             rec_section.append(rec_container)
             article.append(rec_section)
 
+def get_all_posts():
+    """
+    Scan BLOG_DIR and return sorted posts list
+    """
+    posts = []
+    if os.path.exists(BLOG_DIR):
+        for f in os.listdir(BLOG_DIR):
+            if f.endswith('.html') and f != 'index.html':
+                post_path = os.path.join(BLOG_DIR, f)
+                try:
+                    post_soup = load_soup(post_path)
+                    title = "Untitled"
+                    description = ""
+                    
+                    if post_soup.title and post_soup.title.string:
+                        title = post_soup.title.string.split('|')[0].strip()
+                    elif post_soup.find('h1'):
+                        title = post_soup.find('h1').get_text(strip=True)
+                    
+                    desc_meta = post_soup.find('meta', attrs={'name': 'description'})
+                    if desc_meta:
+                        description = desc_meta.get('content', '')
+                        
+                except:
+                    title = f.replace('.html', '').replace('-', ' ').title()
+                    description = ""
+
+                mod_time = os.path.getmtime(post_path)
+                
+                posts.append({
+                    'filename': f,
+                    'title': title,
+                    'description': description,
+                    'mod_time': mod_time,
+                    'url': f"/blog/{f.replace('.html', '')}"
+                })
+    
+    # Sort by time desc
+    posts.sort(key=lambda x: x['mod_time'], reverse=True)
+    return posts
+
 def process_blog_posts(assets):
     if not os.path.exists(BLOG_DIR):
         print(f"Blog directory not found: {BLOG_DIR}")
         return
+    
+    all_posts = get_all_posts()
 
     for filename in os.listdir(BLOG_DIR):
         if not filename.endswith('.html'):
@@ -366,6 +535,16 @@ def process_blog_posts(assets):
         clean_internal_links(soup)
         reconstruct_head(soup, assets, filename, page_type='blog')
         inject_content(soup, assets, page_type='blog', filename=filename)
+        
+        # Special handling for Blog Index
+        if filename == 'index.html':
+            container = soup.find(id='all-articles')
+            if container:
+                container.clear()
+                for post in all_posts:
+                    card = create_article_card(soup, post)
+                    container.append(card)
+        
         save_soup(soup, file_path)
 
 def process_root_pages(assets):
@@ -385,52 +564,20 @@ def inject_latest_articles(soup):
     """
     Inject latest blog posts into index.html
     """
-    # 1. Get Blog Posts
-    posts = []
-    if os.path.exists(BLOG_DIR):
-        for f in os.listdir(BLOG_DIR):
-            if f.endswith('.html'):
-                post_path = os.path.join(BLOG_DIR, f)
-                # Parse title safely
-                try:
-                    post_soup = load_soup(post_path)
-                    title = "Untitled"
-                    if post_soup.title and post_soup.title.string:
-                        title = post_soup.title.string
-                    elif post_soup.find('h1'):
-                        title = post_soup.find('h1').string
-                except:
-                    title = f.replace('.html', '').replace('-', ' ').title()
-
-                mod_time = os.path.getmtime(post_path)
-                
-                posts.append({
-                    'filename': f,
-                    'title': title,
-                    'mod_time': mod_time,
-                    'url': f"/blog/{f.replace('.html', '')}"
-                })
-
-    # Sort by time desc
-    posts.sort(key=lambda x: x['mod_time'], reverse=True)
-    
-    # Take top 3
+    posts = get_all_posts()
     latest_posts = posts[:3]
     
     if not latest_posts:
         return
 
-    # 2. Create Section HTML
-    # Style matches existing sections (dark theme)
+    # Create Section HTML
     section = soup.new_tag('section', id='latest-articles', **{'class': 'py-24 relative z-10 bg-[#030303] border-t border-white/5'})
     
-    # Background decoration
     bg_blob = soup.new_tag('div', **{'class': 'absolute left-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[100px] pointer-events-none'})
     section.append(bg_blob)
 
     container = soup.new_tag('div', **{'class': 'max-w-7xl mx-auto px-6 relative z-10'})
     
-    # Header
     header_div = soup.new_tag('div', **{'class': 'text-center mb-16'})
     h2 = soup.new_tag('h2', **{'class': 'text-3xl md:text-4xl font-bold text-white mb-4'})
     h2.string = "最新动态"
@@ -440,48 +587,19 @@ def inject_latest_articles(soup):
     header_div.append(p)
     container.append(header_div)
     
-    # Grid
     grid = soup.new_tag('div', **{'class': 'grid grid-cols-1 md:grid-cols-3 gap-6'})
     
     for post in latest_posts:
-        # Card
-        card = soup.new_tag('a', href=post['url'], **{'class': 'group block bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/30 transition duration-300 flex flex-col h-full'})
-        
-        # Content
-        content_div = soup.new_tag('div', **{'class': 'p-8 flex flex-col flex-grow'})
-        
-        # Icon/Tag
-        tag_div = soup.new_tag('div', **{'class': 'mb-4'})
-        tag_span = soup.new_tag('span', **{'class': 'inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20'})
-        tag_span.string = "Article"
-        tag_div.append(tag_span)
-        content_div.append(tag_div)
-        
-        # Title
-        h3 = soup.new_tag('h3', **{'class': 'text-xl font-bold text-white mb-4 group-hover:text-blue-400 transition line-clamp-2'})
-        h3.string = post['title']
-        content_div.append(h3)
-        
-        # Arrow (at bottom)
-        arrow = soup.new_tag('div', **{'class': 'mt-auto text-slate-500 text-sm font-bold flex items-center gap-2 group-hover:text-white transition'})
-        arrow.string = "Read More"
-        icon = soup.new_tag('i', **{'class': 'fa-solid fa-arrow-right opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300'})
-        arrow.append(icon)
-        content_div.append(arrow)
-        
-        card.append(content_div)
+        card = create_article_card(soup, post)
         grid.append(card)
         
     container.append(grid)
     section.append(container)
     
-    # 3. Inject into Soup
-    # Remove existing if any
     existing = soup.find('section', id='latest-articles')
     if existing:
         existing.replace_with(section)
     else:
-        # Insert before footer
         footer = soup.find('footer')
         if footer:
             footer.insert_before(section)
@@ -493,12 +611,8 @@ def process_index(assets):
     soup = load_soup(INDEX_PATH)
     clean_internal_links(soup)
     
-    # Inject Latest Articles
     inject_latest_articles(soup)
     
-    # We don't reconstruct head for index.html as it is the source, 
-    # but we could optionally add canonical if missing.
-    # For now, just save the cleaned links.
     save_soup(soup, INDEX_PATH)
 
 def generate_sitemap():
@@ -522,7 +636,6 @@ def generate_sitemap():
             file_path = os.path.join(PROJECT_ROOT, filename)
             lastmod = datetime.datetime.fromtimestamp(os.path.getmtime(file_path)).strftime('%Y-%m-%d')
             
-            # Clean URL
             if filename == 'index.html':
                 loc = BASE_URL + '/'
             else:
@@ -549,7 +662,6 @@ def generate_sitemap():
                     'priority': '0.7'
                 })
     
-    # Build XML
     sitemap_content = ['<?xml version="1.0" encoding="UTF-8"?>']
     sitemap_content.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     
@@ -587,32 +699,23 @@ def generate_robots_txt():
 def main():
     print("Starting build process...")
     
-    # Load Index
     if not os.path.exists(INDEX_PATH):
         print(f"Index file not found: {INDEX_PATH}")
         return
         
     index_soup = load_soup(INDEX_PATH)
     
-    # Phase 1: Extract
     print("Phase 1: Extracting assets from index.html...")
     assets = extract_assets(index_soup)
     print(f"Extracted {len(assets['icons'])} icons and {len(assets['resources'])} resources.")
     
-    # Process Index itself (clean links)
     process_index(assets)
-    
-    # Process Root Pages (about, privacy, terms)
     process_root_pages(assets)
     
-    # Phase 2 & 3: Process Blog Posts
     print("Phase 2 & 3: Processing blog posts...")
     process_blog_posts(assets)
     
-    # Phase 4: Generate Sitemap
     generate_sitemap()
-    
-    # Phase 5: Generate Robots.txt
     generate_robots_txt()
     
     print("Build complete.")
