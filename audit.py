@@ -19,7 +19,7 @@ except ImportError:
 init(autoreset=True)
 
 # --- Configuration & Constants ---
-IGNORE_PATHS = {'.git', 'node_modules', '__pycache__', '.vscode', '.idea'}
+IGNORE_PATHS = {'.git', 'node_modules', '__pycache__', '.vscode', '.idea', 'MasterTool'}
 IGNORE_URL_PREFIXES = ('/go/', 'cdn-cgi', 'javascript:', 'mailto:', '#', 'tel:')
 IGNORE_FILES = {'google', '404.html'} # Filenames containing these strings
 EXTENSIONS = {'.html', '.htm'}

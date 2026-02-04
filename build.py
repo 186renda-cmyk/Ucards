@@ -104,7 +104,7 @@ def extract_assets(index_soup):
     
     return assets
 
-def reconstruct_head(soup, assets, filename, page_type='page'):
+def reconstruct_head(soup, assets, filename, page_type='page', posts=None):
     """
     Phase 2: Head Reconstruction
     """
@@ -135,7 +135,10 @@ def reconstruct_head(soup, assets, filename, page_type='page'):
     
     # Clean URL (Canonical)
     if filename == 'index.html':
-        canonical_url = BASE_URL + '/'
+        if page_type == 'blog':
+            canonical_url = f"{BASE_URL}/blog/"
+        else:
+            canonical_url = BASE_URL + '/'
     else:
         canonical_url = f"{BASE_URL}/{filename.replace('.html', '')}"
         if page_type == 'blog':
@@ -185,7 +188,7 @@ def reconstruct_head(soup, assets, filename, page_type='page'):
     schemas.append(main_schema)
     
     # 2. BreadcrumbList Schema
-    if filename != 'index.html':
+    if filename != 'index.html' or (page_type == 'blog' and filename == 'index.html'):
         breadcrumb_items = [
             {
                 "@type": "ListItem",
@@ -196,7 +199,7 @@ def reconstruct_head(soup, assets, filename, page_type='page'):
         ]
         
         current_pos = 2
-        if page_type == 'blog':
+        if page_type == 'blog' and filename != 'index.html':
             breadcrumb_items.append({
                 "@type": "ListItem",
                 "position": 2,
@@ -218,6 +221,22 @@ def reconstruct_head(soup, assets, filename, page_type='page'):
             "itemListElement": breadcrumb_items
         }
         schemas.append(breadcrumb_schema)
+
+    # 3. ItemList Schema (for Blog Index)
+    if page_type == 'blog' and filename == 'index.html' and posts:
+        item_list_schema = {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "itemListElement": []
+        }
+        for i, post in enumerate(posts):
+            item_list_schema["itemListElement"].append({
+                "@type": "ListItem",
+                "position": i + 1,
+                "url": f"{BASE_URL}{post['url']}",
+                "name": post['title']
+            })
+        schemas.append(item_list_schema)
     
     script_tag = soup.new_tag('script', type='application/ld+json')
     script_tag.string = json.dumps(schemas, indent=2)
@@ -369,7 +388,7 @@ def inject_content(soup, assets, page_type='page', filename=''):
         
     # Inject Visible Breadcrumb (after Nav)
     # Added mt-24 to fix spacing issue with fixed navbar
-    if filename != 'index.html':
+    if filename != 'index.html' or (page_type == 'blog' and filename == 'index.html'):
         breadcrumb_nav = soup.new_tag('nav', attrs={'aria-label': 'breadcrumb', 'class': 'max-w-7xl mx-auto px-6 py-4 mt-24 text-sm text-slate-400'})
         ol = soup.new_tag('ol', attrs={'class': 'flex items-center gap-2'})
         
@@ -533,7 +552,7 @@ def process_blog_posts(assets):
         
         soup = load_soup(file_path)
         clean_internal_links(soup)
-        reconstruct_head(soup, assets, filename, page_type='blog')
+        reconstruct_head(soup, assets, filename, page_type='blog', posts=all_posts if filename == 'index.html' else None)
         inject_content(soup, assets, page_type='blog', filename=filename)
         
         # Special handling for Blog Index
